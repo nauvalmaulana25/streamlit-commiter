@@ -17,12 +17,19 @@ if "GITHUB_TOKEN" not in st.secrets:
 
 g = Github(st.secrets["GITHUB_TOKEN"])
 
-repos = st.secrets.get("REPOS", [])
+repos_raw = st.secrets.get("REPOS", {})
 interval_hours = st.secrets.get("INTERVAL_HOURS", 2)
 auto_wake = st.secrets.get("AUTO_WAKE", True)
 
+if isinstance(repos_raw, dict):
+    repos = [v for k, v in sorted(repos_raw.items()) if k.isdigit()]
+elif isinstance(repos_raw, list):
+    repos = repos_raw
+else:
+    repos = []
+
 if not repos:
-    st.warning("No repos configured. Add REPOS = ['owner/repo', ...] to secrets.")
+    st.warning("No repos configured. Add REPOS = {0 = 'owner/repo', 1 = 'owner/repo'} to secrets.")
     st.stop()
 
 if auto_wake:
